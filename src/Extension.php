@@ -12,7 +12,9 @@ namespace PHPUnit\RattleCorpus;
 use function dirname;
 use function getcwd;
 use function preg_match;
+use function sprintf;
 use function str_starts_with;
+use PHPUnit\Event\Facade as EventFacade;
 use PHPUnit\Runner\Extension\Extension as ExtensionInterface;
 use PHPUnit\Runner\Extension\Facade;
 use PHPUnit\Runner\Extension\ParameterCollection;
@@ -26,7 +28,8 @@ use PHPUnit\TextUI\Configuration\Configuration;
  * The parameter "cacheDirectory" is the cache directory of rattle,
  * ".rattle.cache" by default. A relative cache directory is relative to the
  * directory of the configuration file of PHPUnit, or to the working directory
- * when none is used.
+ * when none is used. An invalid parameter is reported as a PHPUnit warning,
+ * and nothing is stored then.
  *
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for phpunit/rattle-corpus
  */
@@ -40,6 +43,12 @@ final readonly class Extension implements ExtensionInterface
 
         if ($parameters->has('cacheDirectory')) {
             $cacheDirectory = $parameters->get('cacheDirectory');
+        }
+
+        if ($cacheDirectory === '') {
+            $this->warn(sprintf('The parameter "cacheDirectory" of %s must not be empty', self::class));
+
+            return;
         }
 
         $facade->registerSubscriber(
@@ -68,5 +77,13 @@ final readonly class Extension implements ExtensionInterface
         }
 
         return $workingDirectory . '/' . $directory;
+    }
+
+    /**
+     * @param non-empty-string $message
+     */
+    private function warn(string $message): void
+    {
+        EventFacade::emitter()->testRunnerTriggeredPhpunitWarning($message);
     }
 }
