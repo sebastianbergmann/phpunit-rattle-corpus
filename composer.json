@@ -1,0 +1,56 @@
+{
+    "name": "phpunit/rattle-corpus",
+    "description": "PHPUnit test runner extension that copies the counterexamples of falsified properties into the corpus of rattle",
+    "type": "library",
+    "keywords": [
+        "phpunit",
+        "property-based testing",
+        "fuzzing",
+        "rattle"
+    ],
+    "homepage": "https://github.com/sebastianbergmann/phpunit-rattle-corpus",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Sebastian Bergmann",
+            "email": "sebastian@phpunit.de",
+            "role": "lead"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/sebastianbergmann/phpunit-rattle-corpus/issues",
+        "security": "https://github.com/sebastianbergmann/phpunit-rattle-corpus/security/policy"
+    },
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.5",
+        "phpunit/phpunit": "dev-feature/property-based-testing",
+        "sebastian/choice-sequence": "^1.0@dev"
+    },
+    "require-dev": {
+        "sebastian/rattle": "dev-main"
+    },
+    "config": {
+        "platform": {
+            "php": "8.5.12"
+        },
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    },
+    "autoload-dev": {
+        "classmap": [
+            "tests/unit/",
+            "tests/support/"
+        ]
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.0-dev"
+        }
+    }
+}
