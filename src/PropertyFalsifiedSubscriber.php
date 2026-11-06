@@ -9,8 +9,11 @@
  */
 namespace PHPUnit\RattleCorpus;
 
+use function sprintf;
+use PHPUnit\Event\Facade as EventFacade;
 use PHPUnit\Event\Test\PropertyFalsified;
 use PHPUnit\Event\Test\PropertyFalsifiedSubscriber as PropertyFalsifiedSubscriberInterface;
+use Throwable;
 
 /**
  * Stores the choice sequences of the counterexamples of a falsified property
@@ -19,22 +22,24 @@ use PHPUnit\Event\Test\PropertyFalsifiedSubscriber as PropertyFalsifiedSubscribe
  * property was falsified. A property that an explicit example falsified has
  * no choices, so nothing is stored for it.
  *
+ * Storing a choice sequence must not change the outcome of the test run, so
+ * the first choice sequence that cannot be stored is reported as a PHPUnit
+ * warning, and the choice sequences that cannot be stored after it are not.
+ *
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for phpunit/rattle-corpus
  *
  * @internal This class is not covered by the backward compatibility promise for phpunit/rattle-corpus
  */
-final readonly class PropertyFalsifiedSubscriber implements PropertyFalsifiedSubscriberInterface
+final class PropertyFalsifiedSubscriber implements PropertyFalsifiedSubscriberInterface
 {
-    private Corpus $corpus;
+    private readonly Corpus $corpus;
+    private bool $warned = false;
 
     public function __construct(Corpus $corpus)
     {
         $this->corpus = $corpus;
     }
 
-    /**
-     * @throws CannotWriteCorpusException
-     */
     public function notify(PropertyFalsified $event): void
     {
         $sequences = [$event->choiceSequence()];
@@ -48,7 +53,30 @@ final readonly class PropertyFalsifiedSubscriber implements PropertyFalsifiedSub
                 continue;
             }
 
-            $this->corpus->add($event->test()->id(), $choices);
+            try {
+                $this->corpus->add($event->test()->id(), $choices);
+            } catch (Throwable $t) {
+                $this->warn($event, $t);
+
+                return;
+            }
         }
+    }
+
+    private function warn(PropertyFalsified $event, Throwable $t): void
+    {
+        if ($this->warned) {
+            return;
+        }
+
+        $this->warned = true;
+
+        EventFacade::emitter()->testRunnerTriggeredPhpunitWarning(
+            sprintf(
+                'The counterexamples of %s cannot be stored in the corpus of rattle: %s',
+                $event->test()->id(),
+                $t->getMessage(),
+            ),
+        );
     }
 }
