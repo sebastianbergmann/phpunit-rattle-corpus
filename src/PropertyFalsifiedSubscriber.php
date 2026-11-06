@@ -18,9 +18,9 @@ use Throwable;
 /**
  * Stores the choice sequences of the counterexamples of a falsified property
  * in the corpus of the property: the choice sequence of the minimal
- * counterexample and the choice sequence of each other way in which the
- * property was falsified. A property that an explicit example falsified has
- * no choices, so nothing is stored for it.
+ * counterexample and, unless this is turned off, the choice sequence of each
+ * other way in which the property was falsified. A property that an explicit
+ * example falsified has no choices, so nothing is stored for it.
  *
  * Storing a choice sequence must not change the outcome of the test run, so
  * the first choice sequence that cannot be stored is reported as a PHPUnit
@@ -33,19 +33,26 @@ use Throwable;
 final class PropertyFalsifiedSubscriber implements PropertyFalsifiedSubscriberInterface
 {
     private readonly Corpus $corpus;
+    private readonly bool $otherFalsifications;
     private bool $warned = false;
 
-    public function __construct(Corpus $corpus)
+    /**
+     * @param bool $otherFalsifications whether the choice sequences of the other ways in which a property was falsified are stored
+     */
+    public function __construct(Corpus $corpus, bool $otherFalsifications)
     {
-        $this->corpus = $corpus;
+        $this->corpus              = $corpus;
+        $this->otherFalsifications = $otherFalsifications;
     }
 
     public function notify(PropertyFalsified $event): void
     {
         $sequences = [$event->choiceSequence()];
 
-        foreach ($event->otherFalsifications() as $otherFalsification) {
-            $sequences[] = $otherFalsification['choiceSequence'];
+        if ($this->otherFalsifications) {
+            foreach ($event->otherFalsifications() as $otherFalsification) {
+                $sequences[] = $otherFalsification['choiceSequence'];
+            }
         }
 
         foreach ($sequences as $choices) {

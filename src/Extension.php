@@ -25,11 +25,14 @@ use PHPUnit\TextUI\Configuration\Configuration;
  * into the corpora of the properties in rattle's cache directory, from which
  * "rattle fuzz --phpunit" starts.
  *
- * The parameter "cacheDirectory" is the cache directory of rattle,
- * ".rattle.cache" by default. A relative cache directory is relative to the
- * directory of the configuration file of PHPUnit, or to the working directory
- * when none is used. An invalid parameter is reported as a PHPUnit warning,
- * and nothing is stored then.
+ * The extension has two parameters: "cacheDirectory", the cache directory of
+ * rattle, ".rattle.cache" by default, and "otherFalsifications", "true" by
+ * default, "false" to store only the choice sequence of the minimal
+ * counterexample of a property, not those of the other ways in which it was
+ * falsified. A relative cache directory is relative to the directory of the
+ * configuration file of PHPUnit, or to the working directory when none is
+ * used. An invalid parameter is reported as a PHPUnit warning, and nothing is
+ * stored then.
  *
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for phpunit/rattle-corpus
  */
@@ -51,9 +54,24 @@ final readonly class Extension implements ExtensionInterface
             return;
         }
 
+        $otherFalsifications = true;
+
+        if ($parameters->has('otherFalsifications')) {
+            $value = $parameters->get('otherFalsifications');
+
+            if ($value !== 'true' && $value !== 'false') {
+                $this->warn(sprintf('The parameter "otherFalsifications" of %s must be "true" or "false", not "%s"', self::class, $value));
+
+                return;
+            }
+
+            $otherFalsifications = $value === 'true';
+        }
+
         $facade->registerSubscriber(
             new PropertyFalsifiedSubscriber(
                 new Corpus($this->resolve($cacheDirectory, $configuration)),
+                $otherFalsifications,
             ),
         );
     }
