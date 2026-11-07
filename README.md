@@ -7,7 +7,7 @@ PHPUnit test runner extension that copies the counterexamples of falsified prope
 
 PHPUnit and rattle share their inputs: both represent examples as choice sequences of [`sebastian/choice-sequence`](https://github.com/sebastianbergmann/choice-sequence). When PHPUnit falsifies a property, it shrinks the counterexample and reports the minimal counterexample, together with the simplest counterexample for every other way in which the property was falsified while it was shrunk. These counterexamples reach code paths that make the property fail, often behind conditions that random generation rarely satisfies.
 
-With this extension, every ordinary run of PHPUnit, locally or in CI, stores the choice sequences of these counterexamples in the corpus of the property in rattle's cache directory. `rattle fuzz --phpunit` replays the inputs in the corpus of a property first, so a counterexample that still fails becomes a finding, and one that no longer fails stays in the corpus as a regression input. Nobody has to move files by hand.
+With this extension, every ordinary run of PHPUnit, locally or in CI, stores the choice sequences of these counterexamples in the corpus of the property in rattle's cache directory. `rattle fuzz --phpunit` replays the inputs in the corpus of a property first, so a counterexample that still fails becomes a finding. A counterexample that no longer fails stays in the corpus only when it produces a feature, an edge of the code or how often it is taken, that no smaller input in the corpus produces. Otherwise, rattle removes it from the corpus when fuzzing starts. Nobody has to move files by hand.
 
 ## Installation
 
