@@ -16,6 +16,7 @@ use function file_get_contents;
 use function glob;
 use function proc_close;
 use function proc_open;
+use function realpath;
 use function sort;
 use function stream_get_contents;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -79,10 +80,16 @@ final class RattleTest extends TestCase
             ],
         );
 
+        // the location of a failure is relative to the directory of the
+        // configuration file, which is a temporary directory, so the path of
+        // the fixture, which is not below it, is absolute
+        $fixture = realpath(__DIR__ . '/../fixtures/falsified/FalsifiedTest.php');
+
+        $this->assertNotFalse($fixture);
         $this->assertSame(1, $exit, $output);
         $this->assertStringContainsString('(2 stored inputs)', $output);
-        $this->assertStringContainsString('Finding: LengthException at tests/fixtures/falsified/FalsifiedTest.php:31', $output);
-        $this->assertStringContainsString('Finding: DomainException at tests/fixtures/falsified/FalsifiedTest.php:35', $output);
+        $this->assertStringContainsString('Finding: LengthException at ' . $fixture . ':31', $output);
+        $this->assertStringContainsString('Finding: DomainException at ' . $fixture . ':35', $output);
         $this->assertStringContainsString('2 new findings', $output);
 
         // the original input of each finding is a stored counterexample

@@ -47,11 +47,11 @@ final class PropertyFalsifiedSubscriber implements PropertyFalsifiedSubscriberIn
 
     public function notify(PropertyFalsified $event): void
     {
-        $sequences = [$event->choiceSequence()];
+        $sequences = [$event->counterexample()->choiceSequence()];
 
         if ($this->otherFalsifications) {
             foreach ($event->otherFalsifications() as $otherFalsification) {
-                $sequences[] = $otherFalsification['choiceSequence'];
+                $sequences[] = $otherFalsification->counterexample()->choiceSequence();
             }
         }
 
