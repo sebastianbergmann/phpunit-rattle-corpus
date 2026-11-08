@@ -518,12 +518,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "febf9830949cb6bd5bbb56636a20e67065aaa0af"
+                "reference": "4650b46d316fc9c95dcfd0a6832244f625c2698e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/febf9830949cb6bd5bbb56636a20e67065aaa0af",
-                "reference": "febf9830949cb6bd5bbb56636a20e67065aaa0af",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/4650b46d316fc9c95dcfd0a6832244f625c2698e",
+                "reference": "4650b46d316fc9c95dcfd0a6832244f625c2698e",
                 "shasum": ""
             },
             "require": {
@@ -603,8 +603,8 @@
                     "type": "other"
                 }
             ],
-            "time": "2026-11-03T10:24:27+00:00",
-            "published-time": "2026-11-03T10:25:07+00:00"
+            "time": "2026-11-08T17:27:53+00:00",
+            "published-time": "2026-11-08T17:29:47+00:00"
         },
         {
             "name": "sebastian/choice-sequence",
